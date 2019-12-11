@@ -21,7 +21,7 @@ RETRY_HTTP_CODES = [500, 502, 503, 504, 522, 524, 408, 301, 302]
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
-DOWNLOAD_TIMEOUT = 4
+DOWNLOAD_TIMEOUT = 8
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 8
 
@@ -61,7 +61,7 @@ DOWNLOADER_MIDDLEWARES = {
     'douban.middlewares.ProxyMiddleware':543,
     #'douban.middlewares.DoubanDownloaderMiddleware': 543,
 }
-RETRY_TIMES = 30
+RETRY_TIMES = 60
 RETRY_ENABLED = True
 
 # Enable or disable extensions

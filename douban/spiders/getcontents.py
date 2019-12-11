@@ -1,5 +1,6 @@
 import scrapy
 import json
+import re
 from douban.items import DoubanItem, CommmentItem
 
 class CommentSpider(scrapy.Spider):
@@ -12,6 +13,10 @@ class CommentSpider(scrapy.Spider):
     def start_requests(self):
 
         movie_list = ["27668250","26832891","26834248","26389069","26947198","26899304","26387939","26926703"]
+        file = open('Json/movielist.json')
+        content = file.read()
+        movie_list = re.findall('\"([0-9]{8})\"',content)
+        print("tot count: {}", len(movie_list))
         for movie_id in movie_list:
             movie_url = "https://movie.douban.com/subject/{}/".format(movie_id)
             yield scrapy.Request(url = movie_url, callback = lambda response, movie_id = movie_id : self.parse(response, movie_id))
