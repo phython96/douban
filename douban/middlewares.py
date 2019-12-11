@@ -5,7 +5,53 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+from scrapy.downloadermiddlewares.retry import RetryMiddleware, response_status_message
 from scrapy import signals
+import requests
+import redis
+import time
+from fake_useragent import UserAgent
+
+from twisted.internet import defer
+from twisted.internet.error import TimeoutError, DNSLookupError, \
+    ConnectionRefusedError, ConnectionDone, ConnectError, \
+    ConnectionLost, TCPTimedOutError
+
+from scrapy.http import HtmlResponse
+from twisted.web.client import ResponseFailed
+from scrapy.core.downloader.handlers.http11 import TunnelError
+
+
+red = redis.Redis(host = 'localhost', port = 6379, db = 1)
+
+
+
+def get_proxy():
+    while True:
+        res = requests.get("http://127.0.0.1:5010/get/").json()
+        proxy = res['proxy']
+        nowtime = int(time.time())
+        oldtime = red.get(proxy)
+        if oldtime is None or nowtime - int(oldtime) >= 120:
+            red.set(proxy, nowtime)
+            return proxy
+
+def delete_proxy(proxy):
+    requests.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
+
+
+
+class ProxyMiddleware(object):
+    def process_request(self, request, spider):
+        proxy = get_proxy()
+        print("获取代理IP：", proxy)
+        proxy = "https://{}/".format(proxy)
+        request.meta["proxy"] = proxy
+        agent = str(UserAgent().random)
+        print(agent)
+        request.headers["User-Agent"] = agent
+
+
 
 
 class DoubanSpiderMiddleware(object):
@@ -54,6 +100,7 @@ class DoubanSpiderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
 
 
 class DoubanDownloaderMiddleware(object):
