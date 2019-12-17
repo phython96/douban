@@ -32,8 +32,9 @@ def get_proxy():
         proxy = res['proxy']
         nowtime = int(time.time())
         oldtime = red.get(proxy)
-        if oldtime is None or nowtime - int(oldtime) >= 120:
+        if oldtime is None or nowtime - int(oldtime) >= 90:
             red.set(proxy, nowtime)
+            time.sleep(1)
             return proxy
 
 def delete_proxy(proxy):

@@ -33,3 +33,10 @@ class CommmentItem(scrapy.Item):
     comment_vote = scrapy.Field()
     comment_star = scrapy.Field()
     comment_date = scrapy.Field()
+
+class ReviewItem(scrapy.Item):
+    movie_id = scrapy.Field()
+    imdb_tconst = scrapy.Field()
+    review_user = scrapy.Field()
+    review_text = scrapy.Field()
+    review_date = scrapy.Field()

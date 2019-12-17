@@ -21,9 +21,9 @@ RETRY_HTTP_CODES = [500, 502, 503, 504, 522, 524, 408, 301, 302]
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
-DOWNLOAD_TIMEOUT = 8
+DOWNLOAD_TIMEOUT = 6
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 8
+CONCURRENT_REQUESTS = 4
 
 REDIRECT_ENABLED = False
 
