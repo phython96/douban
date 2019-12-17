@@ -13,7 +13,7 @@ class MovieListSpider(scrapy.Spider):
         # https://movie.douban.com/j/new_search_subjects?sort=R&tags=%E7%94%B5%E5%BD%B1&start=200&year_range=2016,2016
         start_year = '2010'
         end_year = '2018'
-        for i in range(200):
+        for i in range(400):
             url = "https://movie.douban.com/j/new_search_subjects?sort=R&tags=%E7%94%B5%E5%BD%B1&start={}&year_range={},{}".format(i * 20,start_year,end_year)
             yield scrapy.Request(url = url)
 
