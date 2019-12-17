@@ -2,6 +2,7 @@ import scrapy
 import json
 import re
 from douban.items import DoubanItem, ReviewItem
+from douban.middlewares import ProxyMiddleware
 
 class ReviewSpider(scrapy.Spider):
     name = 'ReviewSpider'
@@ -47,7 +48,9 @@ class ReviewSpider(scrapy.Spider):
     def parse_page(self, response, movie_id, imdb_tconst):
         reviews_count = len(response.xpath("//a[@class='name']/text()").extract()) ###
         reviews_users = response.xpath("//a[@class='name']/text()").extract() ###
-        reviews_texts = response.xpath("//span[@class='short']/text()").extract()
+        reviews_shorts = response.xpath("//span[@class='short']/text()").extract() ###
+        reviews_id = response.xpath("//div[@class='main review-item']/@id").extract()
+
         reviews_dates = response.xpath("//span[@class='main-meta']/@content").extract() ###
         for i in range(reviews_count):
             item = ReviewItem()
@@ -58,16 +61,31 @@ class ReviewSpider(scrapy.Spider):
             except:
                 pass
             try:
-                item['review_text'] = reviews_texts[i]
-            except:
-                pass
-            try:
                 item['review_date'] = reviews_dates[i]
             except:
                 pass
-
+            try:
+                item['review_short'] = reviews_shorts[i]
+            except:
+                pass
+            try:
+                item['review_id'] = reviews_id[i]
+            except:
+                pass
+            '''
+            try:
+                url = "https://movie.douban.com/j/review/{}/full".format(reviews_id[i])
+                yield scrapy.Request(url = url, callback = lambda response, item = item : self.parse_review(response, item))
+            except:
+                pass
+            '''
             yield item
 
-
+    def parse_review(self, response, item):
+        js = json.loads(response.body)
+        re_h = re.compile('</?\w+[^>]*>')  # 匹配HTML标签
+        review = re_h.sub('',js['html'])
+        item['review_text'] = review
+        yield item
 
 
