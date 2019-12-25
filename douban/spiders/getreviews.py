@@ -18,11 +18,15 @@ class ReviewSpider(scrapy.Spider):
     def start_requests(self):
 
         movie_list = ["27668250","26832891","26834248","26389069","26947198","26899304","26387939","26926703"]
-        file = open('Json/movielist2.json')
+        file = open('Json_1990_1999/movielist.json')
         content = file.read()
-        movie_list = re.findall('\"([0-9]{8})\"',content)
+        movie_list1 = re.findall('\"([0-9]{8})\"', content)
+        movie_list2 = re.findall('\"([0-9]{7})\"', content)
+        movie_list3 = re.findall('\"([0-9]{6})\"', content)
+        movie_list4 = re.findall('\"([0-9]{5})\"', content)
+        movie_list = movie_list1 + movie_list2 + movie_list3 + movie_list4
         logging.info("电影列表总数: {}".format(len(movie_list)))
-        for i in range(1600,1800):
+        for i in range(0,len(movie_list)):
             movie_id = movie_list[i]
             logging.info("电影枚举第{}个，id为:{}".format(i, movie_id))
             movie_url = "https://movie.douban.com/subject/{}/".format(movie_id)
