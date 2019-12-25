@@ -1,6 +1,7 @@
 import scrapy
 import json
 import re
+import logging
 from douban.items import DoubanItem, CommmentItem
 
 class CommentSpider(scrapy.Spider):
@@ -13,31 +14,40 @@ class CommentSpider(scrapy.Spider):
     def start_requests(self):
 
         movie_list = ["27668250","26832891","26834248","26389069","26947198","26899304","26387939","26926703"]
-        file = open('Json/movielist.json')
+        file = open('Json/movielist2.json')
         content = file.read()
         movie_list = re.findall('\"([0-9]{8})\"',content)
-        print("tot count: {}", len(movie_list))
-        for movie_id in movie_list:
+        logging.info("电影列表总数: {}".format(len(movie_list)))
+        for i in range(200,400):
+            movie_id = movie_list[i]
+            logging.info("电影枚举第{}个，id为:{}".format(i, movie_id))
             movie_url = "https://movie.douban.com/subject/{}/".format(movie_id)
             yield scrapy.Request(url = movie_url, callback = lambda response, movie_id = movie_id : self.parse(response, movie_id))
 
     def parse(self, response, movie_id):
+        if str(response.body).find('window.location.href') == -1:
+            logging.info("电影id{}发现重定向检测，重新申请访问".format(movie_id))
+            yield scrapy.Request(url = response.url, callback = lambda response, movie_id = movie_id : self.parse(response, movie_id))
+            return
         #print(response.body)
         imdb_tconst = 0
         try:
             imdb_tconst = response.xpath("//a[re:match(@href, 'imdb')]//text()").extract()[0]
         except:
-            print('movie id:{} 无 imdb tconst'.format(movie_id))
+            logging.info('movie id:{} 无 imdb tconst'.format(movie_id))
 
         comments_count = 0
         try:
             comments_count = response.xpath("//a[re:match(@href, 'comments\?sort=new_score')]//text()").re('[0-9]+')[0]
             comments_count = int(comments_count)
         except:
-            print('movie id:{} 无 短评'.format(movie_id))
-
+            logging.info('movie id:{} 无短评'.format(movie_id))
+            return
+        logging.info("电影ID{}, imdb: {}, 短评数量：{}".format(movie_id, imdb_tconst, comments_count))
+        if comments_count == 0:
+            return
         page_num = comments_count // 20
-        for i in range(min(11,page_num)):
+        for i in range(min(11,page_num+1)):
             start = i * 20
             url = "https://movie.douban.com/subject/{}/comments?start={}&limit=20&sort=new_score&status=P".format(movie_id, start)
             yield scrapy.Request(url = url, callback =

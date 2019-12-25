@@ -9,7 +9,12 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+import datetime
 BOT_NAME = 'douban'
+
+LOG_LEVEL = 'INFO'
+to_day = datetime.datetime.now()
+LOG_FILE = 'logs/log_{}_{}_{}_{}_{}_{}.txt'.format(to_day.year,to_day.month,to_day.day,to_day.hour,to_day.minute,to_day.second)
 
 SPIDER_MODULES = ['douban.spiders']
 NEWSPIDER_MODULE = 'douban.spiders'
@@ -21,9 +26,9 @@ RETRY_HTTP_CODES = [500, 502, 503, 504, 522, 524, 408, 301, 302]
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
-DOWNLOAD_TIMEOUT = 6
+DOWNLOAD_TIMEOUT = 4
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 4
+CONCURRENT_REQUESTS = 10
 
 REDIRECT_ENABLED = False
 

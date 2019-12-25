@@ -32,9 +32,9 @@ def get_proxy():
         proxy = res['proxy']
         nowtime = int(time.time())
         oldtime = red.get(proxy)
-        if oldtime is None or nowtime - int(oldtime) >= 90:
+        if oldtime is None or nowtime - int(oldtime) >= 60:
             red.set(proxy, nowtime)
-            time.sleep(0.1)
+            time.sleep(0.025)
             return proxy
 
 def delete_proxy(proxy):
@@ -49,7 +49,7 @@ class ProxyMiddleware(object):
         proxy = "https://{}/".format(proxy)
         request.meta["proxy"] = proxy
         agent = str(UserAgent().random)
-        print(agent)
+        #print(agent)
         request.headers["User-Agent"] = agent
 
 
