@@ -22,7 +22,7 @@ class ReviewSpider(scrapy.Spider):
         content = file.read()
         movie_list = re.findall('\"([0-9]{8})\"',content)
         logging.info("电影列表总数: {}".format(len(movie_list)))
-        for i in range(600,800):
+        for i in range(1600,1800):
             movie_id = movie_list[i]
             logging.info("电影枚举第{}个，id为:{}".format(i, movie_id))
             movie_url = "https://movie.douban.com/subject/{}/".format(movie_id)

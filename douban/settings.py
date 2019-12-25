@@ -19,7 +19,7 @@ LOG_FILE = 'logs/log_{}_{}_{}_{}_{}_{}.txt'.format(to_day.year,to_day.month,to_d
 SPIDER_MODULES = ['douban.spiders']
 NEWSPIDER_MODULE = 'douban.spiders'
 
-RETRY_HTTP_CODES = [500, 502, 503, 504, 522, 524, 408, 301, 302]
+RETRY_HTTP_CODES = [500, 502, 503, 504, 522, 524, 408, 301, 302, 404]
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'douban (+http://www.yourdomain.com)'

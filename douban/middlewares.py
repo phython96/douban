@@ -9,6 +9,7 @@ from scrapy.downloadermiddlewares.retry import RetryMiddleware, response_status_
 from scrapy import signals
 import requests
 import redis
+import hashlib
 import time
 from fake_useragent import UserAgent
 
@@ -32,9 +33,9 @@ def get_proxy():
         proxy = res['proxy']
         nowtime = int(time.time())
         oldtime = red.get(proxy)
-        if oldtime is None or nowtime - int(oldtime) >= 60:
+        if oldtime is None or nowtime - int(oldtime) >= 30:
             red.set(proxy, nowtime)
-            time.sleep(0.025)
+            time.sleep(0.075)
             return proxy
 
 def delete_proxy(proxy):
@@ -43,6 +44,7 @@ def delete_proxy(proxy):
 
 
 class ProxyMiddleware(object):
+    '''
     def process_request(self, request, spider):
         proxy = get_proxy()
         print("获取代理IP：", proxy)
@@ -51,6 +53,32 @@ class ProxyMiddleware(object):
         agent = str(UserAgent().random)
         #print(agent)
         request.headers["User-Agent"] = agent
+    '''
+    # 动态转发
+    def process_request(self, request, spider):
+
+        #url = request.url
+
+        ip = 'forward.xdaili.cn'
+        port = "80"
+        ip_port = ip + ':' + port
+        timestamp = str(int(time.time()))
+
+        orderno = "ZF201912255648Jkkwbe"
+        secret = "8a53d9893862454fb9aaab575d127e35"
+
+        string = "orderno=" + orderno + "," + "secret=" + secret + "," + "timestamp=" + timestamp
+        string = string.encode()
+        md5_string = hashlib.md5(string).hexdigest()
+        sign = md5_string.upper()
+        auth = "sign=" + sign + "&" + "orderno=" + orderno + "&" + "timestamp=" + timestamp
+        proxy = "https://" + ip_port
+        headers = {"Proxy-Authorization": auth, "User-Agent": str(UserAgent().random)}
+
+        request.headers['User-Agent'] = headers['User-Agent']
+        request.headers['Proxy-Authorization'] = headers['Proxy-Authorization']
+        request.meta['proxy'] = proxy
+        #print(request.headers)
 
 
 
